@@ -5,76 +5,66 @@ from pprint import pprint
 from ships import HeroShip, EnemyShip
 from weapons import Rocket
 from actionprocessing import Collisions
-from gameinfo import Life
+from gameinfo import Life, LifeBar, GameOver
 
 
-SCREEN_X, SCREEN_Y = 1200, 720
-SCREEN_SIZE = (SCREEN_X, SCREEN_Y)
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (125, 125, 125)
-LIGHT_BLUE = (64, 128, 255)
-GREEN = (0, 200, 64)
-YELLOW = (225, 225, 0)
-PINK = (230, 50, 230)
 
 FPS = 30
 WORK = True
 GAME_OVER = False
 JOYSTICK = False
+GAME_OVER = False
+PAUSE = False
 
 
 pygame.init()
 dispinfo = pygame.display.Info()
 SCREEN_SIZE = (dispinfo.current_w, dispinfo.current_h)
+SCREEN_X, SCREEN_Y = SCREEN_SIZE
 screen = pygame.display.set_mode((SCREEN_SIZE), pygame.DOUBLEBUF | pygame.RESIZABLE)
-print(type(screen.get_size()))
+
 bgimage = pygame.image.load('./media/background_sources/background2_2.jpg').convert()
+
 clock = pygame.time.Clock()
+angle = 0
+count_interval = 0
+target_list = []
+cnt = 0
 
 # =====================================================================================
-# ================================ ОТРИСОВКА ФИГУР ====================================
-# =====================================================================================
-
-
-
-
-
-# =====================================================================================
+# ================================ СОЗДАНИЕ ОБЕКТОВ ====================================
 # =====================================================================================
 
 
-lives = pygame.sprite.Group()
+lifebar = LifeBar('./media/sprites/life10x15.png', (10,10), 10)
+lifebar.create_bar()
 
-
+gameover = GameOver('./media/background_sources/gameover.png', SCREEN_SIZE)
 bullet_image = './media/sprites/raketa24x33.png'
 
 heros = pygame.sprite.Group()
-airplan_image = HeroShip('./media/sprites/airplanx60.png',(300,300),angle=0, speed=4, speed_rot=9, group=heros)
+airplane = HeroShip('./media/sprites/airplanx60.png',
+                    (300,300),angle=0, 
+                     speed=4, speed_rot=9, group=heros, health=10)
 
 
-for i in range(airplan_image.health):
-    pos = (20,20)
-    life = Life('./media/sprites/life10x15.png', pos, lives)
-    pos = life.next_pos()
-
-
-bullets = pygame.sprite.Group()
 
 
 target = pygame.sprite.Group()
 sp = 4
 for i in range(2):
     sp += 0.5
-    tar = EnemyShip(screen, './media/sprites/redship60.png',(300,300),angle=90,speed=sp, group=target)
-    tar.set_damage(0.2)
+    tar = EnemyShip(screen, './media/sprites/redship60.png',(300,300),
+                    angle=90,speed=sp, group=target)
 
-angle = 0
-count_interval = 0
 
-target_list = []
-cnt = 0
+bullets = pygame.sprite.Group()
+
+# =====================================================================================
+# =====================================================================================
+
+
 
 
 if pygame.joystick.get_count() > 0:
@@ -82,16 +72,14 @@ if pygame.joystick.get_count() > 0:
     joy = pygame.joystick.Joystick(0)
     joy.init()
 
-# joy = pygame.joystick.Joystick(0)
 
-HAT = (0,0)
 
 while True:
     
-    screen.fill(LIGHT_BLUE)
-# ============================================
-# ======= ОБРАБОТКА СОБЫТИЙ ==================
-# ============================================
+# =====================================================================
+# ======================= ОБРАБОТКА СОБЫТИЙ ===========================
+# =====================================================================
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             WORK = False
@@ -100,11 +88,13 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 WORK = False
                 break
+            if event.key == pygame.K_p:
+                PAUSE = not PAUSE
+            if GAME_OVER and event.key == pygame.K_RETURN:
+                GAME_OVER = False
         elif event.type == pygame.JOYBUTTONDOWN:
-            if joy.get_button(0):
+            if joy.get_button(0) and not GAME_OVER:
                 if count_interval >= 10 or count_interval == 0:
-                    # bullets.add(fig.Bullet( bullet_image, airplan_image.get_pos((0,0)),30,90,airplan_image.angle,speed=20))
-                    # bullets.add(fig.Bullet( bullet_image, airplan_image.get_pos((0,0)),-30,90,airplan_image.angle,speed=20))
                     for h in heros.sprites():
                         Rocket(bullet_image, h.get_pos(), 30, 90, h.angle, speed=20, group=bullets)
                         Rocket(bullet_image, h.get_pos(), -30, 90, h.angle, speed=20, group=bullets)
@@ -113,101 +103,105 @@ while True:
         elif event.type == pygame.JOYHATMOTION:
                 HAT = event.dict['value']
             
-    if JOYSTICK:
+    if JOYSTICK and not GAME_OVER:
         if HAT == (0,1):
-            airplan_image.move_updown((SCREEN_X,SCREEN_Y), True)
+            airplane.move_updown((SCREEN_X,SCREEN_Y), True)
         elif HAT == (0,-1):
-            airplan_image.move_updown((SCREEN_X,SCREEN_Y), False)
+            airplane.move_updown((SCREEN_X,SCREEN_Y), False)
         if HAT == (1,0):
-            airplan_image.rotate(-airplan_image.speed-1)
+            airplane.rotate(-airplane.speed-1)
         elif HAT == (-1,0):
-            airplan_image.rotate(airplan_image.speed-1)
+            airplane.rotate(airplane.speed-1)
         if HAT == (1,1):
-            airplan_image.move_updown((SCREEN_X,SCREEN_Y), True)
-            airplan_image.rotate(-airplan_image.speed-1)
+            airplane.move_updown((SCREEN_X,SCREEN_Y), True)
+            airplane.rotate(-airplane.speed-1)
         elif HAT == (-1,1):
-            airplan_image.move_updown((SCREEN_X,SCREEN_Y), True)
-            airplan_image.rotate(airplan_image.speed-1)
+            airplane.move_updown((SCREEN_X,SCREEN_Y), True)
+            airplane.rotate(airplane.speed-1)
         elif HAT == (-1,-1):
-            airplan_image.move_updown((SCREEN_X,SCREEN_Y), False)
-            airplan_image.rotate(airplan_image.speed-1)
+            airplane.move_updown((SCREEN_X,SCREEN_Y), False)
+            airplane.rotate(airplane.speed-1)
         elif HAT == (1,-1):
-            airplan_image.move_updown((SCREEN_X,SCREEN_Y), False)
-            airplan_image.rotate(-airplan_image.speed-1)
+            airplane.move_updown((SCREEN_X,SCREEN_Y), False)
+            airplane.rotate(-airplane.speed-1)
     
-    keys_pressed = pygame.key.get_pressed()
-    if keys_pressed[pygame.K_UP]:
-        airplan_image.move_updown((SCREEN_X,SCREEN_Y), True)
-    if keys_pressed[pygame.K_DOWN]:
-        airplan_image.move_updown((SCREEN_X, SCREEN_Y),False)
-    if keys_pressed[pygame.K_RIGHT]:
-        airplan_image.rotate(-airplan_image.speed-1)
-    if keys_pressed[pygame.K_LEFT]:
-        airplan_image.rotate(airplan_image.speed-1)
-    if keys_pressed[pygame.K_SPACE]:
-        if count_interval >= 10 or count_interval == 0:
-            # bullets.add(fig.Bullet( bullet_image, airplan_image.get_pos((0,0)),30,90,airplan_image.angle,speed=20))
-            # bullets.add(fig.Bullet( bullet_image, airplan_image.get_pos((0,0)),-30,90,airplan_image.angle,speed=20))
-            for h in heros.sprites():
-                Rocket(bullet_image, h.get_pos(), 30, 90, h.angle, speed=20, group=bullets)
-                Rocket(bullet_image, h.get_pos(), -30, 90, h.angle, speed=20, group=bullets)
-            count_interval = 0
-    count_interval += 1
+    if not GAME_OVER and not PAUSE:
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_UP]:
+            airplane.move_updown((SCREEN_X,SCREEN_Y), True)
+        if keys_pressed[pygame.K_DOWN]:
+            airplane.move_updown((SCREEN_X, SCREEN_Y),False)
+        if keys_pressed[pygame.K_RIGHT]:
+            airplane.rotate(-airplane.speed-1)
+        if keys_pressed[pygame.K_LEFT]:
+            airplane.rotate(airplane.speed-1)
+        if keys_pressed[pygame.K_SPACE]:
+            if count_interval >= 10 or count_interval == 0:
+                for h in heros.sprites():
+                    Rocket(bullet_image, h.get_pos(), 30, 90, h.angle, speed=20, group=bullets)
+                    Rocket(bullet_image, h.get_pos(), -30, 90, h.angle, speed=20, group=bullets)
+                    Rocket(bullet_image, h.get_pos(), 0, 0, h.angle, speed=23, group=bullets)
+                count_interval = 0
+        count_interval += 1
     
     
     
-# ==============================================
-# ==============================================
+# =====================================================================
+# =====================================================================
     if not WORK:
         break
-# ==============================================
-# =========== ОТРИСОВКА ОБЪЕКТОВ ===============
-# ==============================================
-    
-    for blt in bullets.sprites():
-        blt.check_collide(target, True)
-    
-    
-    # airplan_image.check_collisions(target)
-    
-    for hero in heros.sprites():
-        for tar in target.sprites():
-            state, h, t = Collisions.collide_rect(hero, tar)
-            if state:
-                if not h.decrease_health(t.damage):
-                    WORK = False
-                    break
-                t.move_ship(screen)
-            if not WORK:
-                break
-    
-    
-    for blt in bullets.sprites():
-        for ship in target.sprites():
-            state, b, s = Collisions.collide_rect(blt, ship)
-            if state:
-                b.kill()
-                s.move_ship(screen)
-    
+# =====================================================================
+# ======================= ОТРИСОВКА ОБЪЕКТОВ ==========================
+# =====================================================================
     
     screen.blit(bgimage, (0,0))
     
-    lives.update(Life.ALPHA)
-    lives.draw(screen)
+    if not GAME_OVER and not PAUSE:
+        for blt in bullets.sprites():
+            blt.check_collide(target, True)
+        
+        
+        for hero in heros.sprites():
+            for tar in target.sprites():
+                state, h, t = Collisions.collide_rect(hero, tar)
+                if state:
+                    if not h.decrease_health(t.damage):
+                        h.new_life((300,300), 10)
+                        lifebar.reset_bar()
+                        GAME_OVER = True
+                        break
+                    t.move_ship(screen)
+                if not WORK:
+                    break
+        
+        
+        for blt in bullets.sprites():
+            for ship in target.sprites():
+                state, b, s = Collisions.collide_rect(blt, ship)
+                if state:
+                    b.kill()
+                    s.move_ship(screen)
+        
+        
+        lifebar.update(airplane.health)
+        lifebar.draw(screen)
+        
+        heros.update()
+        heros.draw(screen)
+        
+        target.update(screen, airplane.rect.center)
+        target.draw(screen)
+        
+        bullets.update(screen)
+        bullets.draw(screen)
     
-    heros.update()
-    heros.draw(screen)
-    
-    target.update(screen, airplan_image.rect.center)
-    target.draw(screen)
-    
-    bullets.update(screen)
-    bullets.draw(screen)
+    gameover.set_state(GAME_OVER)
+    gameover.draw_gameover(screen)
     
     
     
-# ==============================================
-# ==============================================
+# =====================================================================
+# =====================================================================
     pygame.display.flip()
     clock.tick(FPS)
 
