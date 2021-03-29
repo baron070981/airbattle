@@ -33,14 +33,6 @@ class Weapon(pygame.sprite.Sprite):
         collide = pygame.Rect((self.rect.x+w/2, self.rect.y+h/2, w, h))
         return collide
     
-    # def set_collide(self, rect):
-        # if isinstance(rect, tuple) or isinstance(rect, list):
-            # self.collide = pygame.Rect(tuple(rect))
-        # elif isinstance(rect, pygame.Rect):
-            # self.collide = rect.copy()
-        # else:
-            # raise TypeError('Функция ожидает tuple, list или pygame.Rect')
-    
     def getrect(self):
         if self.offset_angle < 0:
             self.offset_angle = 360 + self.offset_angle
