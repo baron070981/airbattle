@@ -110,10 +110,15 @@ class HeroShip(pygame.sprite.Sprite):
     def decrease_health(self, num):
         self.health -= num
         if self.health <= 0:
-            self.kill()
             return False
         return True
-
+    
+    def new_life(self, pos, health):
+        self.health = health
+        self.rect = self.image.get_rect(center=pos)
+        self.angle = 0
+        self.rotate()
+        self.update_direction()
 
 
 
@@ -183,62 +188,6 @@ class EnemyShip(HeroShip):
 
 
 
-
-# if __name__ == '__main__':
-    
-    
-    # SCREEN_X, SCREEN_Y = 1200, 720
-    # SCREEN_SIZE = (SCREEN_X, SCREEN_Y)
-
-    # WHITE = (255, 255, 255)
-    # BLACK = (0, 0, 0)
-    # GRAY = (125, 125, 125)
-    # LIGHT_BLUE = (64, 128, 255)
-    # GREEN = (0, 200, 64)
-    # YELLOW = (225, 225, 0)
-    # PINK = (230, 50, 230)
-
-    # FPS = 30
-    # WORK = True
-
-
-    # pygame.init()
-    # screen = pygame.display.set_mode((SCREEN_SIZE), pygame.DOUBLEBUF | pygame.RESIZABLE)
-    # clock = pygame.time.Clock()
-    
-    
-    # hero = HeroShip('./sprites/airplanx60.png',(300,300),angle=90)
-    # enemy = EnemyShip(screen, './sprites/redship80.png', (300,300),angle=90)
-    # enemy._rotate((300,300))
-    # while True:
-        # screen.fill(LIGHT_BLUE)
-# # ============================================
-# # ======= ОБРАБОТКА СОБЫТИЙ ==================
-# # ============================================
-        # for event in pygame.event.get():
-            # if event.type == pygame.QUIT:
-                # WORK = False
-                # break
-            # if event.type == pygame.KEYDOWN:
-                # if event.key == pygame.K_ESCAPE:
-                    # WORK = False
-                    # break
-        # if not WORK:
-            # break
-        
-        # enemy.move(SCREEN_SIZE)
-        
-        # hero.draw(screen)
-        # enemy.draw(screen)
-        
-        # pygame.display.flip()
-        # clock.tick(FPS)
-
-
-
-    # pygame.display.quit()
-    # pygame.quit()
-    # exit(0)
 
 
 
