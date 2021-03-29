@@ -24,23 +24,67 @@ class Life(pygame.sprite.Sprite):
         elif flag == self.NOTALPHA:
             self.image.set_alpha(1)
     
-    def next_pos(self):
-        x = self.rect.center[0]+self.rect.width+10
-        return x, self.rect.y
-    
 
 
 class LifeBar:
+    def __init__(self, filename, pos, lenbar=3, space=10):
+        self.original = pygame.image.load(filename).convert_alpha()
+        self.sizerect = self.original.get_size()
+        self.filename = filename
+        self.pos = pos
+        self.lenbar = lenbar
+        self.space = space
+        self.group = pygame.sprite.Group()
     
-    def __init__(self, lenght, group):
-        self.group = group
-        self.lenght = lenght
+    def update(self, lenbar):
+        sprites = self.group.sprites()
+        for i in range(lenbar, self.lenbar):
+            sprites[i].update(0)
     
-    def add_life(self, life):
-        life.add(self.group)
+    def draw(self, screen):
+        self.group.draw(screen)
     
-    def life(self):
+    def create_bar(self):
+        w, h = self.sizerect
+        positions = self.__set_positions(w,h)
+        for i in range(self.lenbar):
+            Life(self.filename, positions[i], self.group)
+    
+    def remove_life(self):
         pass
+    
+    def reset_bar(self):
+        sprites = self.group.sprites()
+        for spr in sprites:
+            spr.update(1)
+    
+    def __set_positions(self, w, h):
+        positions = [self.pos]
+        
+        for i in range(1, self.lenbar):
+            pos = (positions[i-1][0]+self.space, positions[i-1][1])
+            positions.append(pos)
+        return positions
+
+
+
+class GameOver(pygame.sprite.Sprite):
+    
+    def __init__(self, filename, screensize, timeout=1):
+        super().__init__()
+        self.timeout = timeout
+        self.center = (screensize[0]//2, screensize[1]//2)
+        self.image = pygame.image.load(filename)
+        self.rect = self.image.get_rect(center=self.center)
+        self.state = False
+    
+    def set_state(self, state):
+        self.state = state
+    
+    def draw_gameover(self, screen):
+        if self.state:
+            screen.blit(self.image, (self.rect.x,self.rect.y))
+
     
     
     
