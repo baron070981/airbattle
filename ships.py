@@ -46,8 +46,9 @@ class HeroShip(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
     
-    def update(self):
+    def update(self, screen):
         self.update_direction()
+        pygame.draw.rect(screen, (255,0,0), self.rect, width=1)
     
     def update_direction(self):
         tmp_dir = pygame.Vector2(0,-1).rotate(self.angle)
@@ -179,6 +180,51 @@ class EnemyShip(HeroShip):
     def update(self, screen, pos):
         self._rotate(pos)
         self.move(screen)
+
+
+
+class TestShip(pygame.sprite.Sprite):
+    
+    def __init__(self, screen, filename, pos, angle=0, speed=1, health=1, damage=1, weapons=None, group=None):
+        '''
+ screen - surface или кортеж размеров окна
+ filename - путь к файлу с изображением
+ pos - позиция центра корабля кортеж или pygame.Rect
+ angle - угол поворота корабля
+ speed - скорость движения
+ damage - наносимый урон при столкновении
+ weapons - экземпляр класса вооружения
+ group - группа в которую добавится корабль
+        '''
+        super().__init__()
+        if isinstance(screen, pygame.Surface):
+            self.sc_width, self.sc_height = screen.get_size()
+        elif isinstance(screen, tuple) or isinstance(screen, list):
+            self.sc_width, self.sc_height = screen
+        else:
+            raise TypeError('screen должен быть Surface, tuple или list')
+        self.filename = filename
+        
+        self.original_image = pygame.image.load(self.filename).convert_alpha()
+        self.image = self.original_image.copy()
+        
+        if isinstance(pos, tuple):
+            self.pos = pos
+        elif isinstance(pos, pygame.Rect):
+            self.pos = pos.center
+        else:
+            raise TypeError('pos должен быть tuple или pygame.Rect')
+        self.rect = self.image.get_rect(center=self.pos)
+        self.angle = angle
+        self.speed = speed
+        self.health = health
+        self.damage = damage
+        self.weapons = weapons
+        self.group = group
+
+
+
+
 
 
 
