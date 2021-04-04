@@ -87,9 +87,31 @@ class GameOver(pygame.sprite.Sprite):
 
     
     
+class Scores:
     
+    def __init__(self,screen, filename=None, pos=(0,0), color=(255,0,0), text='0'):
+        if isinstance(screen, pygame.Surface):
+            self.size_rect = screen.get_size()
+        elif isinstance(screen, tuple) or isinstance(screen, list):
+            self.size_rect = screen
+        self.pos = pos
+        self.color = color
+        self.text = text
+        self.text_size = int(self.size_rect[1]/10)
+        self.font = pygame.font.Font(filename, self.text_size)
+        self.text_surface = self.font.render(self.text, True, self.color)
     
+    def render(self, text):
+        self.text_surface = self.font.render(str(text), True, self.color)
     
+    def draw(self, screen):
+        screen.blit(self.text_surface, self.pos)
+    
+    def calculate_position(self, screensize):
+        width, height = self.text_surface.get_size()
+        pos_y = 30
+        pos_x = screensize[0] - width - 30
+        self.pos = (pos_x, pos_y)
 
 
 

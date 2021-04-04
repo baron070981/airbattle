@@ -32,6 +32,19 @@ class HeroShip(pygame.sprite.Sprite):
             self.add(group)
         self.collide = self.set_collide()
         self.alpha = 255
+        self.score = 0
+    
+    def add_score(self, score):
+        self.score += score
+    
+    def sub_score(self, score):
+        self.score -= score
+        if self.score < 0:
+            self.score = 0
+    
+    def scores(self):
+        return self.score
+    
     
     def set_collide(self):
         w, h = self.image.get_size()
@@ -48,7 +61,6 @@ class HeroShip(pygame.sprite.Sprite):
     
     def update(self, screen):
         self.update_direction()
-        pygame.draw.rect(screen, (255,0,0), self.rect, width=1)
     
     def update_direction(self):
         tmp_dir = pygame.Vector2(0,-1).rotate(self.angle)
@@ -124,21 +136,25 @@ class HeroShip(pygame.sprite.Sprite):
 
 
 class EnemyShip(HeroShip):
-    def __init__(self, screensize, filename, pos, angle=0, speed = 3, speed_rot=None, health=3, group=None):
+    def __init__(self, screensize, filename, pos, angle=0, speed = 3, speed_rot=None, health=3, score=1, group=None):
         super().__init__(filename, (0,0), angle=0, speed = speed, health=3)
         self.rect = self.__create_ship(screensize)
         self.pos = pos
         self._rotate(pos)
         if group is not None:
             self.add(group)
+        self.score = score
+        self.health = health
+        self.dec_health = health
     
-    def __create_ship(self, screensize):
+    def __create_ship(self, screensize, speed=None):
         if isinstance(screensize, pygame.Surface):
             w, h = screensize.get_size()
         else:
             w, h = screensize[0], screensize[1]
         side = (randint(-1,1), randint(-1,1))
-        print(side)
+        if speed is not None:
+            self.speed = speed
         x = randint(0, w+1)
         y = randint(0, h+1)
         rand_pos = pygame.Vector2(side[0]*x, side[1]*y)
@@ -180,48 +196,14 @@ class EnemyShip(HeroShip):
     def update(self, screen, pos):
         self._rotate(pos)
         self.move(screen)
-
-
-
-class TestShip(pygame.sprite.Sprite):
     
-    def __init__(self, screen, filename, pos, angle=0, speed=1, health=1, damage=1, weapons=None, group=None):
-        '''
- screen - surface или кортеж размеров окна
- filename - путь к файлу с изображением
- pos - позиция центра корабля кортеж или pygame.Rect
- angle - угол поворота корабля
- speed - скорость движения
- damage - наносимый урон при столкновении
- weapons - экземпляр класса вооружения
- group - группа в которую добавится корабль
-        '''
-        super().__init__()
-        if isinstance(screen, pygame.Surface):
-            self.sc_width, self.sc_height = screen.get_size()
-        elif isinstance(screen, tuple) or isinstance(screen, list):
-            self.sc_width, self.sc_height = screen
-        else:
-            raise TypeError('screen должен быть Surface, tuple или list')
-        self.filename = filename
-        
-        self.original_image = pygame.image.load(self.filename).convert_alpha()
-        self.image = self.original_image.copy()
-        
-        if isinstance(pos, tuple):
-            self.pos = pos
-        elif isinstance(pos, pygame.Rect):
-            self.pos = pos.center
-        else:
-            raise TypeError('pos должен быть tuple или pygame.Rect')
-        self.rect = self.image.get_rect(center=self.pos)
-        self.angle = angle
-        self.speed = speed
-        self.health = health
-        self.damage = damage
-        self.weapons = weapons
-        self.group = group
-
+    def _decrease_health(self, num):
+        self.dec_health -= num
+        if self.dec_health <= 0:
+            self.dec_health = self.health
+            return False
+        return True
+    
 
 
 

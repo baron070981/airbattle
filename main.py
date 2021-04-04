@@ -5,7 +5,7 @@ from pprint import pprint
 from ships import HeroShip, EnemyShip
 from weapons import Rocket
 from actionprocessing import Collisions
-from gameinfo import Life, LifeBar, GameOver
+from gameinfo import Life, LifeBar, GameOver, Scores
 
 
 
@@ -30,6 +30,8 @@ im_gameover = './media/background_sources/gameover.png'
 im_rokket = './media/sprites/raketa24x33.png'
 im_hero = './media/sprites/airplanx60.png'
 im_redship = './media/sprites/redship60.png'
+im_yellowship = './media/sprites/yellowship60.png'
+im_grayship = './media/sprites/grayship60.png'
 im_bg_map = './media/background_sources/bgmap.png'
 
 
@@ -45,6 +47,9 @@ HAT = (0,0)
 # ================================ СОЗДАНИЕ ОБЕКТОВ ====================================
 # =====================================================================================
 
+scores = Scores(screen, pos=(500,50))
+scores.calculate_position(SCREEN_SIZE)
+
 gameover = GameOver(im_gameover, SCREEN_SIZE)
 
 lifebar = LifeBar(im_lifebar, (10,10), 10)
@@ -55,11 +60,24 @@ airplane = HeroShip(im_hero,(300,300),angle=0, speed=4,
                     speed_rot=9, group=heros, health=10)
 
 target = pygame.sprite.Group()
+sp = 3
+for i in range(2):
+    sp += 0.4
+    tar = EnemyShip(screen, im_redship,(300,300),
+                    angle=90,speed=sp, group=target, score=1, health=1)
+sp = 3
+
+for i in range(2):
+    sp += 0.4
+    tar = EnemyShip(screen, im_yellowship,(300,300),
+                    angle=90,speed=sp, group=target, score=2, health=2)
+
 sp = 4
 for i in range(2):
-    sp += 0.5
-    tar = EnemyShip(screen, im_redship,(300,300),
-                    angle=90,speed=sp, group=target)
+    sp += 0.4
+    tar = EnemyShip(screen, im_grayship,(300,300),
+                    angle=90,speed=sp, group=target, score=2, health=2)
+
 
 bullets = pygame.sprite.Group()
 
@@ -93,9 +111,9 @@ while True:
             if joy.get_button(0) and not GAME_OVER:
                 if count_interval >= 10 or count_interval == 0:
                     for h in heros.sprites():
-                        Rocket(im_rokket, h.get_pos(), 30, 90, h.angle, speed=20, group=bullets)
-                        Rocket(im_rokket, h.get_pos(), -30, 90, h.angle, speed=20, group=bullets)
-                        Rocket(im_rokket, h.get_pos(), 0, 0, h.angle, speed=20, group=bullets)
+                        Rocket(im_rokket, h.get_pos(), 30, 90, h.angle, speed=20, group=bullets, damage=1)
+                        Rocket(im_rokket, h.get_pos(), -30, 90, h.angle, speed=20, group=bullets,damage=1)
+                        Rocket(im_rokket, h.get_pos(), 0, 0, h.angle, speed=20, group=bullets, damage=2)
                     count_interval = 0
         elif event.type == pygame.JOYHATMOTION:
                 HAT = event.dict['value']
@@ -162,6 +180,9 @@ while True:
             for tar in target.sprites():
                 state, h, t = Collisions.collide_rect(hero, tar)
                 if state:
+                    airplane.sub_score(t.score)
+                    scores.calculate_position(SCREEN_SIZE)
+                    scores.render(airplane.scores())
                     if not h.decrease_health(t.damage):
                         h.new_life((300,300), 10)
                         lifebar.reset_bar()
@@ -177,8 +198,14 @@ while True:
                 state, b, s = Collisions.collide_rect(blt, ship)
                 if state:
                     b.kill()
-                    s.move_ship(screen)
+                    if not s._decrease_health(1):
+                        s.move_ship(screen)
+                        airplane.add_score(s.score)
+                        scores.calculate_position(SCREEN_SIZE)
+                        scores.render(airplane.scores())
         
+        
+        scores.draw(screen)
         
         lifebar.update(airplane.health)
         lifebar.draw(screen)

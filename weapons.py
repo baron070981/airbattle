@@ -77,10 +77,11 @@ class Weapon(pygame.sprite.Sprite):
 class Rocket(Weapon):
     def __init__(self, filename, position:tuple=(0,0), 
                             offset:int=0, offset_angle:float=0,
-                            angle:float=0, speed:int=1, group=None):
+                            angle:float=0, speed:int=1, damage=1, group=None):
         super().__init__(filename, position, offset, offset_angle, angle, speed)
         self.group = group
         self.group.add(self)
+        self.damage = damage
     
     def set_damage(self, damage):
         self.damage = damage
