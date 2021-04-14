@@ -76,10 +76,11 @@ sp = 4
 for i in range(2):
     sp += 0.4
     tar = EnemyShip(screen, im_grayship,(300,300),
-                    angle=90,speed=sp, group=target, score=2, health=2)
+                    angle=90,speed=sp, group=target, score=2, health=3)
 
 
 bullets = pygame.sprite.Group()
+print(target.sprites())
 
 # =====================================================================================
 # =====================================================================================

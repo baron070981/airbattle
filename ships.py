@@ -152,24 +152,30 @@ class EnemyShip(HeroShip):
             w, h = screensize.get_size()
         else:
             w, h = screensize[0], screensize[1]
-        side = (randint(-1,1), randint(-1,1))
         if speed is not None:
             self.speed = speed
-        x = randint(0, w+1)
-        y = randint(0, h+1)
-        rand_pos = pygame.Vector2(side[0]*x, side[1]*y)
+        side = randint(1, 4)
         self.width = self.image.get_size()[0]
         self.height = self.image.get_size()[1]
-        if (rand_pos.x > 0 and rand_pos.x < w) and (rand_pos.y > 0 and rand_pos.y < h):
-            if rand_pos.x > rand_pos.y:
-                rand_pos.x = w
-            else:
-                rand_pos.y = h
-        return pygame.Rect((rand_pos.x+self.rect.width, rand_pos.y+self.rect.height, self.width, self.height))
+        if side == 1:
+            y = -self.height-5
+            x = randint(-self.width-5, w+5)
+        elif side == 2:
+            x = w+5
+            y = randint(-self.height-5, self.height+5)
+        elif side == 3:
+            x = randint(-self.width-5, w+5)
+            y = h+5
+        elif side == 4:
+            x = -self.width-5
+            y = randint(-self.height-5, h+5)
+        print(side, x, y)
+        return pygame.Rect((x, y, self.width, self.height))
     
     def move_ship(self, screen):
-        rect = self.__create_ship(screen)
-        self.rect.move_ip(rect.x, rect.y)
+        self.rect = self.__create_ship(screen)
+        # print('',rect)
+        # self.rect.move_ip(rect.x, rect.y)
 
     def _rotate(self, pos):
         self.pos = pygame.Vector2(pos[0],pos[1])
