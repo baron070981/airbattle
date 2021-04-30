@@ -59,6 +59,8 @@ heros = pygame.sprite.Group()
 airplane = HeroShip(im_hero,(300,300),angle=0, speed=4, 
                     speed_rot=9, group=heros, health=10)
 
+
+
 target = pygame.sprite.Group()
 sp = 3
 for i in range(2):
@@ -80,7 +82,6 @@ for i in range(2):
 
 
 bullets = pygame.sprite.Group()
-print(target.sprites())
 
 # =====================================================================================
 # =====================================================================================

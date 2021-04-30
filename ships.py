@@ -1,8 +1,6 @@
 import pygame
 from random import randint
 import math
-from abc import abstractmethod
-
 
 
 
@@ -169,13 +167,10 @@ class EnemyShip(HeroShip):
         elif side == 4:
             x = -self.width-5
             y = randint(-self.height-5, h+5)
-        print(side, x, y)
         return pygame.Rect((x, y, self.width, self.height))
     
     def move_ship(self, screen):
         self.rect = self.__create_ship(screen)
-        # print('',rect)
-        # self.rect.move_ip(rect.x, rect.y)
 
     def _rotate(self, pos):
         self.pos = pygame.Vector2(pos[0],pos[1])
