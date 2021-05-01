@@ -3,9 +3,9 @@ from random import randint
 import math
 
 
-
-
 class HeroShip(pygame.sprite.Sprite):
+    
+    ''' Класс корабля игрока'''
     
     def __init__(self, filename, pos, angle=0, speed = 6, speed_rot=None, health=3, group=None):
         super().__init__()
@@ -32,9 +32,11 @@ class HeroShip(pygame.sprite.Sprite):
         self.alpha = 255
         self.score = 0
     
+    # добавление очков игрку
     def add_score(self, score):
         self.score += score
     
+    # убавление очков
     def sub_score(self, score):
         self.score -= score
         if self.score < 0:
@@ -43,7 +45,8 @@ class HeroShip(pygame.sprite.Sprite):
     def scores(self):
         return self.score
     
-    
+    # расчет прямоугольника для расчета коллизий
+    # имеет размер меньший чем размер корабля
     def set_collide(self):
         w, h = self.image.get_size()
         w = w/2
@@ -51,6 +54,7 @@ class HeroShip(pygame.sprite.Sprite):
         collide = pygame.Rect((self.rect.x+w/2, self.rect.y+h/2, w, h))
         return collide
     
+    # задает значение наносимого урона при столкновении
     def set_damage(self, damage):
         self.damage = damage
     
@@ -60,6 +64,7 @@ class HeroShip(pygame.sprite.Sprite):
     def update(self, screen):
         self.update_direction()
     
+    # расчет следующей позиции корабля исходя из угла и скорости
     def update_direction(self):
         tmp_dir = pygame.Vector2(0,-1).rotate(self.angle)
         self.direction.update(pygame.Vector2(tmp_dir.x*-1*self.speed_rot, tmp_dir.y*1*self.speed_rot))
@@ -81,6 +86,9 @@ class HeroShip(pygame.sprite.Sprite):
         self.x = self.rect[0]
         self.y = self.rect[1]
     
+    # управление движением корабля вперед и назад
+    # если True движение вперед
+    # если False движение назад
     def move_updown(self, screen_size, state=True):
         w,h = self.rect[2], self.rect[3]
         self.update_direction()
@@ -97,6 +105,7 @@ class HeroShip(pygame.sprite.Sprite):
         self.collide = self.set_collide()
         return self.check_move(screen_size)
     
+    # проверка выхода корабля за пределы экрана
     def check_move(self, screen):
         screen_rect = pygame.Rect((0, 0, screen[0], screen[1]))
         if self.rect.x <= 0:
@@ -112,18 +121,18 @@ class HeroShip(pygame.sprite.Sprite):
             self.rect.y = screen[1]-self.rect.height
             self.y = self.rect.y
     
-    def get_pos(self, step = (0, 0)):
-        return self.rect.center[0], self.rect.center[1]
-    
+    # текущая позиция корабля
     def get_pos(self):
         return self.rect.center[0], self.rect.center[1]
     
+    # уменьшение числа жизней
     def decrease_health(self, num):
         self.health -= num
         if self.health <= 0:
             return False
         return True
     
+    # начальное пложение корабля при старте
     def new_life(self, pos, health):
         self.health = health
         self.rect = self.image.get_rect(center=pos)
@@ -134,6 +143,9 @@ class HeroShip(pygame.sprite.Sprite):
 
 
 class EnemyShip(HeroShip):
+    
+    ''' Класс кораблей противника'''
+    
     def __init__(self, screensize, filename, pos, angle=0, speed = 3, speed_rot=None, health=3, score=1, group=None):
         super().__init__(filename, (0,0), angle=0, speed = speed, health=3)
         self.rect = self.__create_ship(screensize)
@@ -205,9 +217,6 @@ class EnemyShip(HeroShip):
             return False
         return True
     
-
-
-
 
 
 
