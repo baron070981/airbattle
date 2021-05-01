@@ -114,6 +114,31 @@ class Scores:
         self.pos = (pos_x, pos_y)
 
 
+class Pause(pygame.sprite.Sprite):
+    
+    def __init__(self, filename, screensize):
+        super().__init__()
+        self.center = (screensize[0]//2, screensize[1]//2)
+        self.image = pygame.image.load(filename)
+        self.rect = self.image.get_rect(center=self.center)
+        self.state = False
+    
+    def set_pause(self):
+        self.state = not self.state
+    
+    def draw_pause(self, screen):
+        if self.state:
+            screen.blit(self.image, (self.rect.x,self.rect.y))
+
+
+
+
+
+
+
+
+
+
 
 
 
