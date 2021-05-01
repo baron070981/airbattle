@@ -4,8 +4,8 @@ from pprint import pprint
 
 from ships import HeroShip, EnemyShip
 from weapons import Rocket
-from actionprocessing import Collisions
-from gameinfo import Life, LifeBar, GameOver, Scores
+from actionprocessing import Collisions, Path
+from gameinfo import Life, LifeBar, GameOver, Scores, Pause
 
 
 
@@ -25,14 +25,15 @@ SCREEN_X, SCREEN_Y = SCREEN_SIZE
 screen = pygame.display.set_mode((SCREEN_SIZE), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.NOFRAME)
 WIN_WIDTH, WIN_HEIGHT = screen.get_size()
 
-im_lifebar = './media/sprites/life10x15.png'
-im_gameover = './media/background_sources/gameover.png'
-im_rokket = './media/sprites/raketa24x33.png'
-im_hero = './media/sprites/airplanx60.png'
-im_redship = './media/sprites/redship60.png'
-im_yellowship = './media/sprites/yellowship60.png'
-im_grayship = './media/sprites/grayship60.png'
-im_bg_map = './media/background_sources/bgmap.png'
+im_lifebar = Path().add('./media/sprites/life10x15.png')
+im_gameover = Path().add('./media/background_sources/gameover.png')
+im_rokket = Path().add('./media/sprites/raketa24x33.png')
+im_hero = Path().add('./media/sprites/airplanx60.png')
+im_redship = Path().add('./media/sprites/redship60.png')
+im_yellowship = Path().add('./media/sprites/yellowship60.png')
+im_grayship = Path().add('./media/sprites/grayship60.png')
+im_bg_map = Path().add('./media/background_sources/bgmap.png')
+im_pause = Path().add('./media/background_sources/pause.png')
 
 
 bgimage = pygame.image.load(im_bg_map).convert()
@@ -51,6 +52,7 @@ scores = Scores(screen, pos=(500,50))
 scores.calculate_position(SCREEN_SIZE)
 
 gameover = GameOver(im_gameover, SCREEN_SIZE)
+pause = Pause(im_pause, SCREEN_SIZE)
 
 lifebar = LifeBar(im_lifebar, (10,10), 10)
 lifebar.create_bar()
@@ -107,6 +109,7 @@ while True:
                 break
             if event.key == pygame.K_p:
                 PAUSE = not PAUSE
+                pause.set_pause()
             if GAME_OVER and event.key == pygame.K_RETURN:
                 GAME_OVER = False
         elif event.type == pygame.JOYBUTTONDOWN:
@@ -185,10 +188,13 @@ while True:
                     airplane.sub_score(t.score)
                     scores.calculate_position(SCREEN_SIZE)
                     scores.render(airplane.scores())
+                    t.move_ship(screen)
                     if not h.decrease_health(t.damage):
                         h.new_life((300,300), 10)
                         lifebar.reset_bar()
                         GAME_OVER = True
+                        for trg in target.sprites():
+                            trg.move_ship(screen)
                         break
                     t.move_ship(screen)
                 if not WORK:
@@ -221,8 +227,12 @@ while True:
         bullets.update(screen)
         bullets.draw(screen)
     
-    gameover.set_state(GAME_OVER)
-    gameover.draw_gameover(screen)
+    elif GAME_OVER:
+        gameover.set_state(GAME_OVER)
+        gameover.draw_gameover(screen)
+    
+    elif PAUSE:
+        pause.draw_pause(screen)
     
     
     
