@@ -3,6 +3,14 @@ from random import randint
 import math
 
 
+# Модуль самолетов
+# 
+# 
+# 
+# 
+
+
+
 class HeroShip(pygame.sprite.Sprite):
     
     ''' Класс корабля игрока'''
@@ -157,7 +165,11 @@ class EnemyShip(HeroShip):
         self.health = health
         self.dec_health = health
     
+    
     def __create_ship(self, screensize, speed=None):
+        """
+        Создание корабля противника в случайном месте за границами экрана
+        """
         if isinstance(screensize, pygame.Surface):
             w, h = screensize.get_size()
         else:

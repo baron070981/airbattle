@@ -1,7 +1,7 @@
 import pygame
 
 
-
+# Модуль отображения информации (уровень жизни, очки...)
 
 
 class Life(pygame.sprite.Sprite):

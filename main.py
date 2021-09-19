@@ -19,12 +19,14 @@ PAUSE = False
 
 
 pygame.init()
+
 dispinfo = pygame.display.Info()
 SCREEN_SIZE = (dispinfo.current_w, dispinfo.current_h)
 SCREEN_X, SCREEN_Y = SCREEN_SIZE
 screen = pygame.display.set_mode((SCREEN_SIZE), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.NOFRAME)
 WIN_WIDTH, WIN_HEIGHT = screen.get_size()
 
+# получение путей к изображениям
 im_lifebar = Path().add('./media/sprites/life10x15.png')
 im_gameover = Path().add('./media/background_sources/gameover.png')
 im_rokket = Path().add('./media/sprites/raketa24x33.png')
@@ -36,6 +38,7 @@ im_bg_map = Path().add('./media/background_sources/bgmap.png')
 im_pause = Path().add('./media/background_sources/pause.png')
 
 
+# загрузка фонового изображения
 bgimage = pygame.image.load(im_bg_map).convert()
 bgimage = pygame.transform.scale(bgimage,(WIN_WIDTH, WIN_HEIGHT))
 
@@ -48,21 +51,26 @@ HAT = (0,0)
 # ================================ СОЗДАНИЕ ОБЕКТОВ ====================================
 # =====================================================================================
 
+# загрузка счетчика очков
 scores = Scores(screen, pos=(500,50))
 scores.calculate_position(SCREEN_SIZE)
 
+# загрузка изображений gameover и pause
 gameover = GameOver(im_gameover, SCREEN_SIZE)
 pause = Pause(im_pause, SCREEN_SIZE)
 
+# загрузка изображения уровня жизни
 lifebar = LifeBar(im_lifebar, (10,10), 10)
 lifebar.create_bar()
 
+
+# загрузка изображения самолета игрока
 heros = pygame.sprite.Group()
 airplane = HeroShip(im_hero,(300,300),angle=0, speed=4, 
                     speed_rot=9, group=heros, health=10)
 
 
-
+# загрузка самолетов противника
 target = pygame.sprite.Group()
 sp = 3
 for i in range(2):
@@ -88,6 +96,7 @@ bullets = pygame.sprite.Group()
 # =====================================================================================
 # =====================================================================================
 
+# проверка подключения джойстика
 if pygame.joystick.get_count() > 0:
     JOYSTICK = True
     joy = pygame.joystick.Joystick(0)

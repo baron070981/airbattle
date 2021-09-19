@@ -3,9 +3,19 @@ from random import randint
 from pprint import pprint
 from abc import ABC, abstractmethod
 
+# Модуль вооружения
+
+
+
+
 
 
 class Weapon(pygame.sprite.Sprite):
+    
+    """
+    Абстрактный класс общий для вооружений
+    """
+    
     
     def __init__(self, filename, position:tuple=(0,0), 
                             offset:int=0, offset_angle:float=0,
@@ -27,6 +37,9 @@ class Weapon(pygame.sprite.Sprite):
         self.collide = self.set_collide()
     
     def set_collide(self):
+        """
+        установка границы столкновения
+        """
         w, h = self.image.get_size()
         w = w/2
         h = h/2
@@ -115,38 +128,6 @@ class Rocket(Weapon):
 
 
 
-
-
-if __name__ == '__main__':
-    SCREEN_X, SCREEN_Y = 1200, 720
-    SCREEN_SIZE = (SCREEN_X, SCREEN_Y)
-
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    GRAY = (125, 125, 125)
-    LIGHT_BLUE = (64, 128, 255)
-    GREEN = (0, 200, 64)
-    YELLOW = (225, 225, 0)
-    PINK = (230, 50, 230)
-
-    FPS = 30
-    WORK = True
-    JOYSTICK = False
-
-
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_SIZE), pygame.DOUBLEBUF | pygame.RESIZABLE)
-    print(type(screen.get_size()))
-    bgimage = pygame.image.load('./background_sources/bgmap.png').convert()
-    clock = pygame.time.Clock()
-    
-    
-    g = pygame.sprite.Group()
-    w = Rocket('./sprites/redship60.png', group=g)
-    w1 = Rocket('./sprites/redship60.png', group=g)
-    w2 = Rocket('./sprites/redship60.png', group=g)
-    print(w)
-    print(g)
 
 
 

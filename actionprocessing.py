@@ -5,12 +5,12 @@ import os
 import os.path
 
 
-'''
-Модуль обработки взаимодействий объектов друг с другом.
-
-'''
 
 class Collisions:
+    
+    """
+    класс проверки столкновений
+    """
     
     def __init__(self):
         pass
@@ -27,7 +27,9 @@ class Collisions:
 
 
 class Path:
-    
+    """
+    класс обработки путей к файлам
+    """
     def __init__(self):
         self.Home = os.path.abspath(os.path.dirname(__file__))
     
